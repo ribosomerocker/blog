@@ -20,13 +20,14 @@ import Development.Shake
 import Development.Shake.Classes ( Binary )
 import Development.Shake.Forward
     ( cacheAction, forwardOptions, shakeArgsForward )
-import Development.Shake.FilePath ( (-<.>), (</>), dropDirectory1 )
+import Development.Shake.FilePath ( (-<.>), (</>), dropDirectory1, splitPath, takeFileName, takeDirectory )
 import GHC.Generics ( Generic )
 import Slick
     ( substitute, compileTemplate', markdownToHTML, convert )
 import qualified Data.Text as T
 import Data.Aeson.KeyMap (union)
 import Data.Time (defaultTimeLocale, parseTimeOrError, formatTime, iso8601DateFormat, getCurrentTime, UTCTime)
+import Data.List (isInfixOf)
 
 
 data SiteMeta = SiteMeta { baseUrl :: String
@@ -70,7 +71,7 @@ withSiteMeta _ = error "only add site meta to objects"
 
 main :: IO ()
 main = do
-  let shOpts = 
+  let shOpts =
         forwardOptions $ shakeOptions
           { shakeVerbosity = Verbose
           , shakeLintInside = ["./web/"]
@@ -113,7 +114,10 @@ copyStaticFiles :: Action ()
 copyStaticFiles = do
   filepaths <- getDirectoryFiles "./web/" ["css//*", "templates/index.html"]
   void $ forP filepaths \paths ->
-    copyFileChanged ("web" </> paths) (outputFolder </> paths)
+    if "template" `isInfixOf` takeDirectory paths then
+      copyFileChanged ("web" </> paths) (outputFolder </> takeFileName paths)
+    else
+      copyFileChanged ("web" </> paths) (outputFolder </> paths)
 
 formatDate :: String -> String
 formatDate humanDate = toIsoDate parsedTime
