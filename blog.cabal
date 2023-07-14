@@ -35,3 +35,4 @@ executable blog
       NamedFieldPuns
       OverloadedRecordDot
       BlockArguments
+      DuplicateRecordFields

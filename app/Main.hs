@@ -1,17 +1,32 @@
+{-# OPTIONS_GHC -Wno-deprecations #-}
 module Main where
 
-import Control.Lens
-import Control.Monad
+import Control.Lens ( (?~), At(at) )
+import Control.Monad ( void )
 import Data.Aeson as A
-import Data.Aeson.Lens as A
+    ( FromJSON, Value(String, Object), ToJSON(toJSON) )
+import Data.Aeson.Lens as A ( AsValue(_Object) )
 import Development.Shake
-import Development.Shake.Classes
+    ( copyFileChanged,
+      forP,
+      readFile',
+      writeFile',
+      shakeOptions,
+      getDirectoryFiles,
+      liftIO,
+      Action,
+      ShakeOptions(shakeLintInside, shakeVerbosity),
+      Verbosity(Verbose) )
+import Development.Shake.Classes ( Binary )
 import Development.Shake.Forward
-import Development.Shake.FilePath
-import GHC.Generics
+    ( cacheAction, forwardOptions, shakeArgsForward )
+import Development.Shake.FilePath ( (-<.>), (</>), dropDirectory1 )
+import GHC.Generics ( Generic )
 import Slick
+    ( substitute, compileTemplate', markdownToHTML, convert )
 import qualified Data.Text as T
 import Data.Aeson.KeyMap (union)
+import Data.Time (defaultTimeLocale, parseTimeOrError, formatTime, iso8601DateFormat, getCurrentTime, UTCTime)
 
 
 data SiteMeta = SiteMeta { baseUrl :: String
@@ -22,8 +37,7 @@ data SiteMeta = SiteMeta { baseUrl :: String
                 deriving (Generic, Eq, Ord, Show, ToJSON)
 
 
-data IndexInfo = IndexInfo { posts :: [Post] } 
-  deriving (Generic, Show, FromJSON, ToJSON)
+data BlogInfo = BlogInfo { posts :: [Post] } deriving (Generic, Show, FromJSON, ToJSON)
 
 data Post = Post { title :: String
                  , content :: String
@@ -31,6 +45,15 @@ data Post = Post { title :: String
                  , date :: String
                  }
             deriving (Generic, Eq, Ord, Show, FromJSON, ToJSON, Binary)
+
+data AtomData =
+  AtomData { title        :: String
+           , domain       :: String
+           , posts        :: [Post]
+           , currentTime  :: String
+           , atomUrl      :: String }
+    deriving (Generic, ToJSON, Eq, Ord, Show)
+
 
 siteMeta :: SiteMeta
 siteMeta = SiteMeta { baseUrl = "denotation.pages.dev"
@@ -58,11 +81,11 @@ main = do
 outputFolder :: FilePath
 outputFolder = "output/"
 
-buildIndex :: [Post] -> Action ()
-buildIndex posts = do
-  indexT <- compileTemplate' "web/templates/index.html"
-  let indexHTML = T.unpack $ substitute indexT (withSiteMeta $ toJSON (IndexInfo { posts }))
-  writeFile' (outputFolder </> "index.html") indexHTML
+buildBlog :: [Post] -> Action ()
+buildBlog posts = do
+  blogT <- compileTemplate' "web/templates/blog.html"
+  let blogHTML = T.unpack $ substitute blogT (withSiteMeta $ toJSON (BlogInfo { posts }))
+  writeFile' (outputFolder </> "blog.html") blogHTML
 
 buildPosts :: Action [Post]
 buildPosts = do
@@ -88,13 +111,44 @@ buildPost srcPath = cacheAction ("build" :: T.Text, srcPath) do
 
 copyStaticFiles :: Action ()
 copyStaticFiles = do
-  filepaths <- getDirectoryFiles "./web/" ["css//*"]
+  filepaths <- getDirectoryFiles "./web/" ["css//*", "templates/index.html"]
   void $ forP filepaths \paths ->
     copyFileChanged ("web" </> paths) (outputFolder </> paths)
+
+formatDate :: String -> String
+formatDate humanDate = toIsoDate parsedTime
+  where
+    parsedTime =
+      parseTimeOrError True defaultTimeLocale "%b %e, %Y" humanDate :: UTCTime
+
+rfc3339 :: Maybe String
+rfc3339 = Just "%H:%M:%SZ"
+
+toIsoDate :: UTCTime -> String
+toIsoDate = formatTime defaultTimeLocale (iso8601DateFormat rfc3339)
+
+buildFeed :: [Post] -> Action ()
+buildFeed posts' = do
+  now <- liftIO getCurrentTime
+  let
+      atomData =
+        AtomData
+          { title = siteMeta.siteTitle
+          , domain = siteMeta.baseUrl
+          , posts = mkAtomPost <$> posts'
+          , currentTime = toIsoDate now
+          , atomUrl = "/atom.xml"
+          }
+  atomTempl <- compileTemplate' "web/templates/atom.xml"
+  writeFile' (outputFolder </> "atom.xml") . T.unpack $ substitute atomTempl (toJSON atomData)
+    where
+      mkAtomPost :: Post -> Post
+      mkAtomPost p = p { date = formatDate $ p.date }
 
 buildRules :: Action ()
 buildRules = do
   allPosts <- buildPosts
-  buildIndex allPosts
+  buildBlog allPosts
+  buildFeed allPosts
   copyStaticFiles
 
