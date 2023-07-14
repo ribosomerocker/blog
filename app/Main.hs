@@ -28,6 +28,7 @@ import qualified Data.Text as T
 import Data.Aeson.KeyMap (union)
 import Data.Time (defaultTimeLocale, parseTimeOrError, formatTime, iso8601DateFormat, getCurrentTime, UTCTime)
 import Data.List (isInfixOf)
+import Data.Foldable (traverse_)
 
 
 data SiteMeta = SiteMeta { baseUrl :: String
@@ -84,9 +85,9 @@ outputFolder = "output/"
 
 buildBlog :: [Post] -> Action ()
 buildBlog posts = do
-  blogT <- compileTemplate' "web/templates/blog.html"
-  let blogHTML = T.unpack $ substitute blogT (withSiteMeta $ toJSON (BlogInfo { posts }))
-  writeFile' (outputFolder </> "blog.html") blogHTML
+  [blogT, indexT] <- traverse compileTemplate' ["web/templates/blog.html", "web/templates/index.html"]
+  let htmlify thing = T.unpack $ substitute thing (withSiteMeta $ toJSON (BlogInfo { posts }))
+  traverse_ (\(x,y) -> writeFile' (outputFolder </> x) (htmlify y)) [("blog.html", blogT), ("index.html", indexT)]
 
 buildPosts :: Action [Post]
 buildPosts = do
@@ -112,12 +113,9 @@ buildPost srcPath = cacheAction ("build" :: T.Text, srcPath) do
 
 copyStaticFiles :: Action ()
 copyStaticFiles = do
-  filepaths <- getDirectoryFiles "./web/" ["css//*", "templates/index.html"]
+  filepaths <- getDirectoryFiles "./web/" ["css//*"]
   void $ forP filepaths \paths ->
-    if "template" `isInfixOf` takeDirectory paths then
-      copyFileChanged ("web" </> paths) (outputFolder </> takeFileName paths)
-    else
-      copyFileChanged ("web" </> paths) (outputFolder </> paths)
+    copyFileChanged ("web" </> paths) (outputFolder </> paths)
 
 formatDate :: String -> String
 formatDate humanDate = toIsoDate parsedTime

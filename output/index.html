@@ -4,12 +4,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Programming and its theoretical foundations">
-    <title>{{siteTitle}}</title>
+    <title>Denotation</title>
     <link rel="icon" type="image/png" href="/images/favicon.png">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    {{>web/templates/header.html}}
+    <header>
+        <nav>
+            <ul id="menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/blog.html">Blog</a></li>
+            </ul>
+        </nav>
+    </header>
     <div id="page">
       <h1>Wow. Hello</h1>
       <br>
@@ -35,4 +42,16 @@
       <br>
     </div>
 
-{{>web/templates/footer.html}}
+<footer>
+    <p>Built with Haskell using <a href="https://github.com/ChrisPenner/slick">slick</a> ❤️</p>
+    <ul id="contacts">
+        <li> <a class="ext-link" href="https://github.com/ribosomerocker">
+                  <img src="/images/github-logo.svg" alt="GitHub Profile" />
+              </a></li>
+        <li> <a class="ext-link" href="https://discuss.systems/@verdigris">
+                <img src="/images/mastodon-logo.svg" alt="Mastodon profile" />
+              </a></li>
+    </ul>
+</footer>
+</body>
+</html>
