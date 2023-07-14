@@ -1,9 +1,7 @@
 body {
     display: flex;
-    flex-direction: column;
-    margin: 1em auto;
-    max-width: 40em;
-    padding: 0 .62em;
+    flex-flow: nowrap column;
+    margin: auto;
     line-height: 1.6;
     font-size: 18px;
     background-color: #181a1b;
@@ -12,7 +10,9 @@ body {
 }
 
 
-h1,h2,h3 {
+h1,
+h2,
+h3 {
     line-height: 1.2;
 }
 
@@ -25,24 +25,19 @@ header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-
     padding: 20px;
     background-color: #3c3939;
-    margin-left: 0;
-    margin-right: 0;
 }
 
 footer {
     background-color: #070809;
-    flex-shrink: 0;
     padding: 20px;
     margin-top: auto;
-    margin-left: 0;
-    margin-right: 0;
 }
 
-.page {
-    flex: 1 0 auto;
+#page {
+    max-width: 40em;
+    margin: 0 auto;
     padding: 20px;
 }
 
