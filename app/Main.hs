@@ -29,7 +29,6 @@ data Post = Post { title :: String
                  , content :: String
                  , url :: String
                  , date :: String
-                 , image :: Maybe String
                  }
             deriving (Generic, Eq, Ord, Show, FromJSON, ToJSON, Binary)
 
@@ -89,7 +88,7 @@ buildPost srcPath = cacheAction ("build" :: T.Text, srcPath) do
 
 copyStaticFiles :: Action ()
 copyStaticFiles = do
-  filepaths <- getDirectoryFiles "./web/" ["images//*", "css//*"]
+  filepaths <- getDirectoryFiles "./web/" ["css//*"]
   void $ forP filepaths \paths ->
     copyFileChanged ("web" </> paths) (outputFolder </> paths)
 
