@@ -1,5 +1,17 @@
 <footer>
     <p>Built with Haskell using <a href="https://github.com/ChrisPenner/slick">slick</a> ❤️</p>
+    <ul id="contacts">
+        {{#githubUser}}
+        <li> <a class="ext-link" href="https://github.com/ribosomerocker">
+                <img src="/images/github-logo.svg" alt="GitHub Profile" />
+            </a></li>
+            {{/githubUser}}
+            {{#mastodonHandle}}
+        <li><a class="ext-link" href="https://discuss.systems/@verdigris">
+                <img src="/images/mastodon-logo.svg" alt="Mastodon profile" />
+            </a></li>
+            {{/mastodonHandle}}
+    </ul>
 </footer>
 </body>
 </html>
