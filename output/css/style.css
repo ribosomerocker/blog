@@ -3,8 +3,7 @@ body {
     max-width: 40em;
     padding: 0 .62em;
     line-height: 1.6;
-    font-size: 16px;
-    font-family: Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+    font-size: 18px;
     background-color: #181a1b;
     color: rgb(189, 183, 175);
 }
@@ -12,4 +11,25 @@ body {
 
 h1,h2,h3 {
     line-height: 1.2;
+}
+
+.ext-link img {
+    width: 32px;
+    height: 32px;
+}
+
+.right-sidebar {
+    position: absolute;
+    top: 0.75em;
+    right: 0.7em;
+    display: flex;
+}
+
+#beacon {
+    font-size: 4em;
+    height: 1.5em;
+    width: 1.5em;
+    text-align: center;
+    position: absolute;
+    margin: 0.1em;
 }
