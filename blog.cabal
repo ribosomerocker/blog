@@ -1,0 +1,37 @@
+cabal-version:      3.4
+name:               blog
+version:            0.1.0.0
+synopsis:           blug
+-- description:
+license:            AGPL-3.0-only
+license-file:       LICENSE
+author:             ribosomerocker
+maintainer:         bentenson34@gmail.com
+-- copyright:
+category:           Text
+build-type:         Simple
+extra-doc-files:    CHANGELOG.md
+-- extra-source-files:
+
+executable blog
+    main-is:          Main.hs
+    build-depends:    base
+                    , slick
+                    , aeson
+                    , containers
+                    , lens
+                    , lens-aeson
+                    , shake
+                    , text
+                    , time
+    hs-source-dirs:   app
+    default-language: GHC2021
+    ghc-options: -Wall -fdefer-typed-holes -fno-show-valid-hole-fits
+    default-extensions:
+      DeriveGeneric
+      DeriveAnyClass
+      OverloadedStrings
+      NoFieldSelectors
+      NamedFieldPuns
+      OverloadedRecordDot
+      BlockArguments

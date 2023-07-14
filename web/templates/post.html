@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="{{siteTitle}}"
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/syntax.css">
+</head>
+<body>
+    {{>web/templates/header.html}}
+
+    <div id="page">
+        <div class="wrapper">
+            <div class="masthead">
+                <span class="title">
+                    {{title}}
+                </span>
+                <br>
+
+                {{#image}}
+                <img class="post-image" src="/images/{{image}}">
+                {{/image}}
+                <br>
+                <br>
+                <span class="date">{{date}}</span>
+                <br>
+                <div class="metadata">
+                </div>
+            </div>
+            <article class="post">
+                {{content}}
+
+                <br>
+                <br>
+
+            </article>
+        </div>
+
+{{>web/templates/footer.html}}
