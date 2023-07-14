@@ -27,31 +27,24 @@ header {
     justify-content: space-between;
 
     padding: 20px;
-    background-color: #343B28;
+    background-color: #3c3939;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+footer {
+    background-color: #070809;
+    flex-shrink: 0;
+    padding: 20px;
+    margin-top: auto;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .page {
     flex: 1 0 auto;
     padding: 20px;
 }
-
-/*.right-sidebar {
-    position: absolute;
-    top: 0.75em;
-    right: 0.7em;
-    display: flex;
-}
-
-#beacon {
-    position: absolute;
-    text-align: center;
-    height: 1.5em;
-    width: 1.5em;
-    margin: 0.1em;
-    top: 0.75em;
-    left: 0.7em;
-}
-*/
 
 a {
     color: #3391ff;
@@ -61,16 +54,4 @@ a {
     font-weight: 400;
     font-size: 3em;
     text-transform: capitalize;
-}
-
-/*header {
-    background-color: #0F2031;
-}
-*/
-
-footer {
-    background-color: #070809;
-    flex-shrink: 0;
-    padding: 20px;
-    margin-top: auto;
 }
