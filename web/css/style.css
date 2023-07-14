@@ -39,3 +39,13 @@ h1,h2,h3 {
 a {
     color: #3391ff;
 }
+
+.date {
+    align: right;
+}
+
+.title {
+    font-weight: 400;
+    font-size: 3em;
+    text-transform: capitalize;
+}
