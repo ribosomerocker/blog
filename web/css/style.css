@@ -1,4 +1,6 @@
 body {
+    display: flex;
+    flex-direction: column;
     margin: 1em auto;
     max-width: 40em;
     padding: 0 .62em;
@@ -16,10 +18,23 @@ h1,h2,h3 {
 .ext-link img {
     width: 32px;
     height: 32px;
-    margin: 0.7em;
 }
 
-.right-sidebar {
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    padding: 20px;
+    background-color: #343B28;
+}
+
+.page {
+    flex: 1 0 auto;
+    padding: 20px;
+}
+
+/*.right-sidebar {
     position: absolute;
     top: 0.75em;
     right: 0.7em;
@@ -35,6 +50,7 @@ h1,h2,h3 {
     top: 0.75em;
     left: 0.7em;
 }
+*/
 
 a {
     color: #3391ff;
@@ -46,10 +62,13 @@ a {
     text-transform: capitalize;
 }
 
-header {
+/*header {
     background-color: #0F2031;
 }
+*/
 
-footer p {
+footer {
     background-color: #070809;
+    flex-shrink: 0;
+    padding: 20px;
 }
