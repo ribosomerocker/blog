@@ -8,6 +8,7 @@ body {
     font-size: 18px;
     background-color: #181a1b;
     color: rgb(189, 183, 175);
+    min-height: 100vh;
 }
 
 
@@ -71,4 +72,5 @@ footer {
     background-color: #070809;
     flex-shrink: 0;
     padding: 20px;
+    margin-top: auto;
 }
