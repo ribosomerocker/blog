@@ -1,25 +1,22 @@
 <header>
-    <nav>
-        <a id="beacon" href="/">
-            <div id="home-text">Home</div>
-        </a>
+    <a id="beacon" href="/">
+        <div id="home-text">Home</div>
+    </a>
 
-        <a id="beacon" href="/blog">
-            <div id="blog-text">Blog</div>
-        </a>
-    </nav>
+    <a id="beacon" href="/blog">
+        <div id="blog-text">Blog</div>
+    </a>
 
-    <div class="right-sidebar">
-        {{#githubUser}}
-        <a class="ext-link" href="https://github.com/{{githubUser}}">
-            <img src="/images/github-logo.svg" alt="GitHub Profile"/>
-        </a>
-        {{/githubUser}}
+    
+    {{#githubUser}}
+    <a class="ext-link" href="https://github.com/{{githubUser}}">
+        <img src="/images/github-logo.svg" alt="GitHub Profile"/>
+    </a>
+    {{/githubUser}}
 
-        {{#mastodonHandle}}
-        <a class="ext-link" href="https://discuss.systems/{{mastodonHandle}}">
-            <img src="/images/mastodon-logo.svg" alt="Mastodon profile"/>
-        </a>
-        {{/mastodonHandle}}
-    </div>
+    {{#mastodonHandle}}
+    <a class="ext-link" href="https://discuss.systems/{{mastodonHandle}}">
+        <img src="/images/mastodon-logo.svg" alt="Mastodon profile"/>
+    </a>
+    {{/mastodonHandle}}
 </header>
