@@ -16,7 +16,7 @@ h1,h2,h3 {
 .ext-link img {
     width: 32px;
     height: 32px;
-    margin: 2em;
+    margin: 0.7em;
 }
 
 .right-sidebar {
@@ -32,4 +32,6 @@ h1,h2,h3 {
     height: 1.5em;
     width: 1.5em;
     margin: 0.1em;
+    top: 0.75em;
+    left: 0.7em;
 }
