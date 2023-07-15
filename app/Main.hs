@@ -20,33 +20,35 @@ import Development.Shake
 import Development.Shake.Classes ( Binary )
 import Development.Shake.Forward
     ( cacheAction, forwardOptions, shakeArgsForward )
-import Development.Shake.FilePath ( (-<.>), (</>), dropDirectory1, splitPath, takeFileName, takeDirectory )
+import Development.Shake.FilePath ( (-<.>), (</>), dropDirectory1, takeFileName, dropExtension )
 import GHC.Generics ( Generic )
 import Slick
     ( substitute, compileTemplate', markdownToHTML, convert )
 import qualified Data.Text as T
 import Data.Aeson.KeyMap (union)
 import Data.Time (defaultTimeLocale, parseTimeOrError, formatTime, iso8601DateFormat, getCurrentTime, UTCTime)
-import Data.List (isInfixOf)
 import Data.Foldable (traverse_)
 import Data.Bifunctor (Bifunctor(first))
-import Data.Text (replace)
+import System.Random.Stateful (uniformListM, globalStdGen)
 
 
 data SiteMeta = SiteMeta { baseUrl :: String
                          , siteTitle :: String
                          , githubUser :: String
                          , mastodonHandle :: String
+                         , assetHash :: String
                          }
                 deriving (Generic, Eq, Ord, Show, ToJSON)
 
 
-data BlogInfo = BlogInfo { posts :: [Post] } deriving (Generic, Show, FromJSON, ToJSON)
+data BlogInfo = BlogInfo { posts :: [Post] }
+  deriving (Generic, Show, FromJSON, ToJSON)
 
 data Post = Post { title :: String
                  , content :: String
                  , url :: String
                  , date :: String
+                 , description :: String
                  }
             deriving (Generic, Eq, Ord, Show, FromJSON, ToJSON, Binary)
 
@@ -59,18 +61,22 @@ data AtomData =
     deriving (Generic, ToJSON, Eq, Ord, Show)
 
 
-siteMeta :: SiteMeta
-siteMeta = SiteMeta { baseUrl = "denotation.pages.dev"
-                    , siteTitle = "Denotation"
-                    , githubUser = "ribosomerocker"
-                    , mastodonHandle = "@verdigris"
-                    }
+siteMeta :: IO SiteMeta
+siteMeta = do
+  (rand :: String) <- uniformListM 10 globalStdGen
 
-withSiteMeta :: Value -> Value
-withSiteMeta (Object obj) = Object $ union obj siteMetaObj
+  pure $ SiteMeta { baseUrl = "denotation.pages.dev"
+                  , siteTitle = "Denotation"
+                  , githubUser = "ribosomerocker"
+                  , mastodonHandle = "@verdigris"
+                  , assetHash = rand
+                  }
+
+withSiteMeta :: Value -> SiteMeta -> Value
+withSiteMeta (Object obj) meta = Object $ union obj siteMetaObj
   where
-    Object siteMetaObj = toJSON siteMeta
-withSiteMeta _ = error "only add site meta to objects"
+    Object siteMetaObj = toJSON meta
+withSiteMeta _ _ = error "only add site meta to objects"
 
 main :: IO ()
 main = do
@@ -87,27 +93,30 @@ outputFolder = "output/"
 
 buildBlog :: [Post] -> Action ()
 buildBlog posts = do
-  paths <- getDirectoryFiles "." [ "web/templates/*.main" ]
+  paths <- getDirectoryFiles "." [ "web/templates//*.main" ]
+  meta <- liftIO siteMeta
+  let pPaths = fmap dropExtension paths
+      blogInfo = BlogInfo { posts }
+      htmlify thing = T.unpack $ substitute thing (withSiteMeta (toJSON blogInfo) meta)
   things <- traverse compileTemplate' paths
-  let htmlify thing = T.unpack $ substitute thing (withSiteMeta $ toJSON (BlogInfo { posts }))
-  traverse_ (\(x,y) -> writeFile' (outputFolder </> T.unpack (replace ".main" "" (T.pack x))) (htmlify y)) (first takeFileName <$> zip paths things)
+  traverse_ (\(x,y) -> writeFile' (outputFolder </> x) (htmlify y)) (first takeFileName <$> zip pPaths things)
 
 buildPosts :: Action [Post]
 buildPosts = do
-  paths <- getDirectoryFiles "." ["web/posts//*.md"]
+  paths <- getDirectoryFiles "." [ "web/posts//*.md" ]
   forP paths buildPost
 
 buildPost :: FilePath -> Action Post
-buildPost srcPath = cacheAction ("build" :: T.Text, srcPath) do
+buildPost srcPath = cacheAction ("build" :: T.Text, srcPath) $ do
   liftIO . putStrLn $ "Rebuilding post: " <> srcPath
   postContent <- readFile' srcPath
   -- load post content and metadata as JSON blob
   postData <- markdownToHTML . T.pack $ postContent
+  meta <- liftIO siteMeta
   let postUrl = T.pack . dropDirectory1 $ srcPath -<.> "html"
       withPostUrl = _Object . at "url" ?~ String postUrl
-
   -- Add additional metadata we've been able to compute
-  let fullPostData = withSiteMeta (withPostUrl postData)
+  let fullPostData = withSiteMeta (withPostUrl postData) meta
   template <- compileTemplate' "web/templates/post.html"
   writeFile' (outputFolder </> T.unpack postUrl) . T.unpack $ substitute template fullPostData
   -- Convert the metadat into a Post object
@@ -117,7 +126,7 @@ buildPost srcPath = cacheAction ("build" :: T.Text, srcPath) do
 copyStaticFiles :: Action ()
 copyStaticFiles = do
   filepaths <- getDirectoryFiles "./web/" ["css//*", "robots.txt", "assets//*"]
-  void $ forP filepaths \paths ->
+  void $ forP filepaths $ \paths ->
     copyFileChanged ("web" </> paths) (outputFolder </> paths)
 
 formatDate :: String -> String
@@ -135,11 +144,12 @@ toIsoDate = formatTime defaultTimeLocale (iso8601DateFormat rfc3339)
 buildFeed :: [Post] -> Action ()
 buildFeed posts' = do
   now <- liftIO getCurrentTime
+  meta <- liftIO siteMeta
   let
       atomData =
         AtomData
-          { title = siteMeta.siteTitle
-          , domain = siteMeta.baseUrl
+          { title = meta.siteTitle
+          , domain = meta.baseUrl
           , posts = mkAtomPost <$> posts'
           , currentTime = toIsoDate now
           , atomUrl = "/atom.xml"
@@ -153,7 +163,7 @@ buildFeed posts' = do
 buildRules :: Action ()
 buildRules = do
   allPosts <- buildPosts
-  buildBlog allPosts
+  liftIO (print allPosts)
   buildFeed allPosts
+  buildBlog allPosts
   copyStaticFiles
-

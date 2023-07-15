@@ -24,6 +24,8 @@ executable blog
                     , shake
                     , text
                     , time
+                    , bytestring
+                    , random
     hs-source-dirs:   app
     default-language: GHC2021
     ghc-options: -Wall -fdefer-typed-holes -fno-show-valid-hole-fits
