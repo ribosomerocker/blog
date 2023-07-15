@@ -29,7 +29,7 @@ import Data.Aeson.KeyMap (union)
 import Data.Time (defaultTimeLocale, parseTimeOrError, formatTime, iso8601DateFormat, getCurrentTime, UTCTime)
 import Data.Foldable (traverse_)
 import Data.Bifunctor (Bifunctor(first))
-import System.Random.Stateful (uniformListM, globalStdGen)
+import System.Random.Stateful (uniformListM, globalStdGen, randomRIO)
 
 
 data SiteMeta = SiteMeta { baseUrl :: String
@@ -63,13 +63,13 @@ data AtomData =
 
 siteMeta :: IO SiteMeta
 siteMeta = do
-  (rand :: String) <- uniformListM 10 globalStdGen
+  (rand :: Integer) <- randomRIO (0, 9999999999)
 
   pure $ SiteMeta { baseUrl = "denotation.pages.dev"
                   , siteTitle = "Denotation"
                   , githubUser = "ribosomerocker"
                   , mastodonHandle = "@verdigris"
-                  , assetHash = rand
+                  , assetHash = show rand
                   }
 
 withSiteMeta :: Value -> SiteMeta -> Value
