@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Programming and its theoretical foundations">
+    <title>{{siteTitle}}</title>
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <link rel="stylesheet" href="/css/style.css?{{assetHash}}" type="text/css">
+</head>
+<body>
+    {{>web/templates/header.html}}
+    <div id="page">
+        <section class="table-of-contents">
+            <h1>All Posts</h1>
+            <div class="metadata">
+            </div>
+            {{>web/templates/post-list.html}}
+        </section>
+    </div>
+
+{{>web/templates/footer.html}}

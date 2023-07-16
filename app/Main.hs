@@ -83,7 +83,7 @@ main = do
   let shOpts =
         forwardOptions $ shakeOptions
           { shakeVerbosity = Verbose
-          , shakeLintInside = ["./web/"]
+          , shakeLintInside = ["./site/"]
           }
   shakeArgsForward shOpts buildRules
 
@@ -93,7 +93,7 @@ outputFolder = "output/"
 
 buildBlog :: [Post] -> Action ()
 buildBlog posts = do
-  paths <- getDirectoryFiles "." [ "web/templates//*.main" ]
+  paths <- getDirectoryFiles "." [ "site/templates//*.main" ]
   meta <- liftIO siteMeta
   let pPaths = fmap dropExtension paths
       blogInfo = BlogInfo { posts }
@@ -103,7 +103,7 @@ buildBlog posts = do
 
 buildPosts :: Action [Post]
 buildPosts = do
-  paths <- getDirectoryFiles "." [ "web/posts//*.md" ]
+  paths <- getDirectoryFiles "." [ "site/posts//*.md" ]
   forP paths buildPost
 
 buildPost :: FilePath -> Action Post
@@ -117,7 +117,7 @@ buildPost srcPath = cacheAction ("build" :: T.Text, srcPath) $ do
       withPostUrl = _Object . at "url" ?~ String postUrl
   -- Add additional metadata we've been able to compute
   let fullPostData = withSiteMeta (withPostUrl postData) meta
-  template <- compileTemplate' "web/templates/post.html"
+  template <- compileTemplate' "site/templates/post.html"
   writeFile' (outputFolder </> T.unpack postUrl) . T.unpack $ substitute template fullPostData
   -- Convert the metadat into a Post object
   convert fullPostData
@@ -125,9 +125,9 @@ buildPost srcPath = cacheAction ("build" :: T.Text, srcPath) $ do
 
 copyStaticFiles :: Action ()
 copyStaticFiles = do
-  filepaths <- getDirectoryFiles "./web/" ["css//*", "robots.txt", "assets//*"]
+  filepaths <- getDirectoryFiles "./site/" ["css//*", "robots.txt", "assets//*"]
   void $ forP filepaths $ \paths ->
-    copyFileChanged ("web" </> paths) (outputFolder </> paths)
+    copyFileChanged ("site" </> paths) (outputFolder </> paths)
 
 formatDate :: String -> String
 formatDate humanDate = toIsoDate parsedTime
@@ -154,7 +154,7 @@ buildFeed posts' = do
           , currentTime = toIsoDate now
           , atomUrl = "/atom.xml"
           }
-  atomTempl <- compileTemplate' "web/templates/atom.xml"
+  atomTempl <- compileTemplate' "site/templates/atom.xml"
   writeFile' (outputFolder </> "atom.xml") . T.unpack $ substitute atomTempl (toJSON atomData)
     where
       mkAtomPost :: Post -> Post

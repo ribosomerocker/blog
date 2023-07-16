@@ -351,13 +351,13 @@ template {
 /* STOP RESETTING THE SHITTY BROWSER DEFAULTS ps. thanks kelle */
 
 @font-face {
-  font-family: "Manrope";
-  src: url("/assets/fonts/manrope/Manrope_variable.ttf");
+  font-family: Manrope;
+  src: url(/assets/fonts/manrope/Manrope_variable.ttf);
   font-display: swap;
 }
 
 body {
-  font-family: "Manrope", Fallback, system-ui;
+  font-family: Manrope, Fallback, system-ui;
   font-size: 1.25em;
   display: flex;
   flex-flow: nowrap column;

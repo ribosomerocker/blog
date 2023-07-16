@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Programming and its theoretical foundations">
+    <title>{{siteTitle}}</title>
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <link rel="stylesheet" href="/css/style.css?{{assetHash}}" type="text/css">
+</head>
+<body>
+    {{>web/templates/header.html}}
+    <div id="page">
+      <h1>Wow. Hello</h1>
+      
+      <p>This is my first site. I am a programmer who's interested in the theoretical basis and how that could improve programming in practice. One of my favourite programming languages is Haskell. I have experience with Java, Python, C, and Rust. In this website I will mainly post articles about cool topics that I know of, and maybe a sounud introduction to programming and DSA. Perhaps some advanced abstractions as well that I think everyone should use. Stay tuned!</p>
+      
+      <h2>"denotation"? What kind of name is that for a website?</h2>
+      <p>The name of this website is called "denotation" for a reason. It's mainly got to do with denotational semantics, which to my understanding is linking code to it's canonical mathematical abstraction, which I absolutely love. Writing code in hopes of keeping it as denotational as possible allows us to reuse more code and for details to be clearer.</p>
+      
+      <h2>That's a lot of jargon that I don't understand!!</h2>
+
+      <p>Haha, sorry! Don't let any of that scare you! I'll always try to keep everything I write accessible to as many people as possible, and if anything isn't, don't hesitate to tell me how wrong or nonsensical some of what I'm saying is, there is no shame in that and I will always oblige to fix it.</p>
+      
+      <h1>Cool. How is this website hosted?</h1>
+      
+      <p>I use Cloudflare Pages for hosting and the beautiful domain name, and I use Haskell and <a href="https://github.com/chrispenner/slick">Slick</a> to generate it.</p>
+    </div>
+
+{{>web/templates/footer.html}}
